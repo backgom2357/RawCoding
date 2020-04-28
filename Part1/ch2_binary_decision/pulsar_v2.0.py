@@ -18,7 +18,6 @@ class Pulsar:
         self.output_cnt = 1
         self.weight, self.bias = self.init_model()
         self.data = self.load_pulsar_dataset(adjust_ratio)
-        self.shuffle_map = np.arange(self.data.shape[0])
 
     def pulsar_exec(self, epoch_count=10, mb_size=10, report=1):
         self.train_and_test(epoch_count, mb_size, report)
@@ -54,14 +53,15 @@ class Pulsar:
         return weight, bias
 
     def train_and_test(self, epoch_count, mb_size, report):
-        step_count, test_begin_idx = self.arrange_data(mb_size)
-        test_x, test_y = self.get_test_data(test_begin_idx)
+        step_count, shuffle_map, test_begin_idx = self.arrange_data(mb_size)
+        test_x, test_y = self.get_test_data(shuffle_map, test_begin_idx)
 
         for epoch in range(epoch_count):
             losses = []
+            np.random.shuffle(shuffle_map[:test_begin_idx])
 
             for n in range(step_count):
-                train_x, train_y = self.get_train_data(mb_size, n, test_begin_idx)
+                train_x, train_y = self.get_train_data(mb_size, n, shuffle_map)
                 loss, _ = self.run_train(train_x, train_y)
                 losses.append(loss)
 
@@ -75,20 +75,19 @@ class Pulsar:
         print('\nFinal Test: final result = {}'.format(acc_str))
 
     def arrange_data(self, mb_size):
-        np.random.shuffle(self.shuffle_map)
+        shuffle_map = np.arange(self.data.shape[0])
+        np.random.shuffle(shuffle_map)
         step_count = int(self.data.shape[0] * 0.8) // mb_size
         test_begin_idx = step_count * mb_size
-        return step_count, test_begin_idx
+        return step_count, shuffle_map, test_begin_idx
 
-    def get_test_data(self, test_begin_idx):
-        test_data = self.data[self.shuffle_map[test_begin_idx:]]
+    def get_test_data(self, shuffle_map, test_begin_idx):
+        test_data = self.data[shuffle_map[test_begin_idx:]]
         return test_data[:, :-self.output_cnt], test_data[:, -self.output_cnt:]
 
 
-    def get_train_data(self, mb_size, nth, test_begin_idx):
-        if nth == 0:
-            np.random.shuffle(self.shuffle_map[:test_begin_idx])
-        train_data = self.data[self.shuffle_map[mb_size*nth:mb_size*(nth+1)]]
+    def get_train_data(self, mb_size, nth, shuffle_map):
+        train_data = self.data[shuffle_map[mb_size*nth:mb_size*(nth+1)]]
         return train_data[:, :-self.output_cnt], train_data[:, -self.output_cnt:]
 
 
@@ -150,12 +149,12 @@ class Pulsar:
 
         tp = np.sum(np.logical_and(est_yes, ans_yes))
         fp = np.sum(np.logical_and(est_yes, ans_no))
-        fn = np.sum(np.logical_and(est_no, ans_no))
-        tn = np.sum(np.logical_and(est_no, ans_yes))
+        fn = np.sum(np.logical_and(est_no, ans_yes))
+        tn = np.sum(np.logical_and(est_no, ans_no))
 
-        accuracy = self.safe_div(tp + fn, tp + tn + fp + fn)
+        accuracy = self.safe_div(tp + tn, tp + tn + fp + fn)
         precision = self.safe_div(tp, tp + fp)
-        recall = self.safe_div(tp, tp + tn)
+        recall = self.safe_div(tp, tp + fn)
         f1 = 2 * self.safe_div(recall * precision, recall + precision)
 
         return [accuracy, precision, recall, f1]
