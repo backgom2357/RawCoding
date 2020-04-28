@@ -73,7 +73,7 @@ type: Binary Decision
 
 $$σ(x) = \frac{1}{1+e^{-x}}$$
 
-![figure1.png](img/Untitled.png)
+![sigmoid](img/Untitled.png)
 
 sigmoid 함수는
 
@@ -134,7 +134,7 @@ $$\frac{1}{a_1} \log_2 a_1 + \cdots + \frac{1}{a_m} \log_2 a_m = \sum_{i=1}^m \f
 
 > 허프만 코드는 표현하려는 대상의 분포 비율을 조사해 자주 나타나는 대상에는 짧은 이진 코드를, 간혹 나타나는 대상에는 긴 이진 코드를 할당해 전체 표현에 필요한 비트 수를 줄여주는 정보 압축 기법
 
-![figure2](img/Untitled%201.png)
+![figure1](img/Untitled1.png)
 
 주어진 확률 분포에 대한 정보 엔트로피
 
@@ -209,7 +209,7 @@ $$H=x-xz + \log(1+ e^{-x})$$
 
 - 시그모이드 함수의 정의를 대입해 정리하면
 
-![Untitled/Untitled%202.png](Untitled/Untitled%202.png)
+![figure2](img/Untitled2.png)
 
 일반적으로 이진 판단 문제의 정답은 0과 1로 주어지므로
 
@@ -248,7 +248,7 @@ $$\sigma(x) = \frac{e^{-\max(-x,0)}}{1+e^{-|x|}} \\ H = \max(x,0) - xz + \log(1+
 
 **호출 관계**
 
-![figure3](img/Untitled%203.png)
+![figure3](img/Untitled3.png)
 
 [Variables](https://www.notion.so/56d59f6c482d49829e3a810265cb4a5a)
 
@@ -339,7 +339,7 @@ F1 값
 
 이에 따라 네가지 평가지표는 다음과 같이 정의
 
-![figure4](img/Untitled%204.png)
+![figure4](img/Untitled4.png)
 
 이 방법으로 예제 프로그램 확장
 
